@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>QuoteBoard</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      color: #eee;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    h1 {
+      color: #4ecca3;
+      font-size: 2.5rem;
+      margin-bottom: 2rem;
+      text-align: center;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    form {
+      display: grid;
+      gap: 1rem;
+      margin-bottom: 3rem;
+      background: rgba(255,255,255,0.05);
+      padding: 1.5rem;
+      border-radius: 12px;
+      border: 1px solid rgba(78, 204, 163, 0.2);
+      box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    }
+
+    input,
+    textarea,
+    button {
+      font: inherit;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.05);
+      color: #eee;
+      transition: all 0.2s ease;
+    }
+
+    input:focus,
+    textarea:focus {
+      outline: none;
+      border-color: #4ecca3;
+      background: rgba(255,255,255,0.08);
+      box-shadow: 0 0 0 3px rgba(78, 204, 163, 0.1);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 100px;
+      font-family: inherit;
+    }
+
+    button {
+      background: #4ecca3;
+      color: #1a1a2e;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      padding: 1rem;
+    }
+
+    button:hover {
+      background: #3db88a;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(78, 204, 163, 0.3);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    .quote {
+      background: rgba(255,255,255,0.05);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      border-radius: 12px;
+      border-left: 4px solid #4ecca3;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      transition: transform 0.2s ease;
+    }
+
+    .quote:hover {
+      transform: translateX(4px);
+      background: rgba(255,255,255,0.08);
+    }
+
+    .quote > div:first-child {
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+      color: #fff;
+    }
+
+    .quote > div:last-child {
+      color: #4ecca3;
+      font-style: italic;
+      font-size: 0.9rem;
+    }
+
+    p {
+      text-align: center;
+      color: #999;
+      font-style: italic;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>QuoteBoard</h1>
+
+  <form method="post" action="/quotes">
+    <input name="author" placeholder="Author (optional)" />
+    <textarea name="text" placeholder="Write a quote..." required></textarea>
+    <button type="submit">Add quote</button>
+  </form>
+
+  {{#if quotes.length}}
+  {{#each quotes}}
+  <div class="quote">
+    <div>{{this.text}}</div>
+    <div>— {{this.author}}</div>
+  </div>
+  {{/each}}
+  {{else}}
+  <p>No quotes yet. Add the first one.</p>
+  {{/if}}
+</body>
+
+</html>
