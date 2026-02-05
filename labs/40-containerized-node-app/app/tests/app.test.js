@@ -27,7 +27,7 @@ test('POST /quotes with empty text redirects to home', async () => {
     url: '/quotes',
     payload: {
       author: 'Test Author',
-      text: ''  // Empty text should redirect
+      text: ''  // redirect
     },
     headers: {
       'content-type': 'application/x-www-form-urlencoded'
@@ -40,11 +40,7 @@ test('POST /quotes with empty text redirects to home', async () => {
   await app.close();
 });
 
-// Database-backed tests require DATABASE_URL to be set correctly
-// To run these tests with database support:
-// 1. Ensure PostgreSQL is running (via Docker Compose)
-// 2. Set DATABASE_URL environment variable:
-//    DATABASE_URL=postgres://postgres:postgres@localhost:5432/postgres npm test
+
 
 test('GET / responds with HTML page when database is available', async () => {
   const app = await buildApp();
@@ -54,13 +50,12 @@ test('GET / responds with HTML page when database is available', async () => {
     url: '/'
   });
 
-  // This test will pass if database is connected, otherwise skip
   if (response.statusCode === 200) {
     assert.ok(response.body.includes('QuoteBoard'), 'Response should contain QuoteBoard title');
     assert.ok(response.body.includes('<form'), 'Response should contain a form');
     assert.ok(response.headers['content-type'].includes('text/html'), 'Content-Type should be HTML');
   } else {
-    // Database not available - test skipped
+    // Database not available 
     assert.strictEqual(response.statusCode, 500, 'Expected error without database');
   }
 
@@ -109,7 +104,7 @@ test('POST /quotes inserts data when database is available', async () => {
 
   assert.strictEqual(postResponse.statusCode, 302, 'Should redirect after POST');
 
-  // Verify insertion by fetching quotes
+  // verifie en fetch quotes
   const getResponse = await app.inject({
     method: 'GET',
     url: '/api/quotes'
@@ -121,7 +116,7 @@ test('POST /quotes inserts data when database is available', async () => {
     assert.ok(foundQuote, 'Quote should be added to database');
     assert.strictEqual(foundQuote.author, 'Test Author', 'Author should match');
   } else {
-    // Database not available - test passed at redirect level
+    // database off
     assert.ok(true, 'Database not available for verification');
   }
 

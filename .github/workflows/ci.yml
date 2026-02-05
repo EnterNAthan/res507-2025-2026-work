@@ -5,53 +5,62 @@ on:
   pull_request:
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
 
+  test-app:
+    name: Unit Tests
+    runs-on: ubuntu-latest
     steps:
-      # Récupération code
       - name: Check out repository
         uses: actions/checkout@v4
 
-      # Setup Node.js
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "24"
+          cache: 'npm'
+          cache-dependency-path: labs/40-containerized-node-app/app/package-lock.json
 
-      # Installation dépendances
       - name: Install dependencies
         working-directory: labs/40-containerized-node-app/app
         run: npm ci
 
-      # Tests applicatifs
-      - name: Run tests if present
+      - name: Run tests
         working-directory: labs/40-containerized-node-app/app
         run: npm test --if-present
 
-      # Build image
-      # Note : on se place dans le dossier du lab pour que Docker trouve le Dockerfile
+  
+  # a besoin de test app pour lancer grace à need
+  build-and-verify:
+    name: Docker Build & Smoke Test
+    needs: test-app 
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
       - name: Build Docker image
         run: |
           cd labs/40-containerized-node-app
           docker build -t quote-app -f docker/Dockerfile .
 
-      # Test runtime
-      - name: Run container
+      - name: Run container (Smoke Test)
         run: |
           docker run -d --name quote-app -p 3000:3000 quote-app
+          
+          echo "Waiting for container to start..."
           for i in $(seq 1 30); do
             if curl -fsS http://localhost:3000/health >/dev/null; then
-              echo "Health check passed"
+              echo " Health check passed"
               exit 0
             fi
             sleep 1
           done
-          echo "Health check failed"
-          docker logs quote-app || true
+          
+          echo " Health check failed"
+          docker logs quote-app
           exit 1
 
-      # Nettoyage conteneur
       - name: Stop container
         if: always()
         run: docker rm -f quote-app || true
