@@ -21,17 +21,20 @@ jobs:
 
       # Installation dépendances
       - name: Install dependencies
-        working-directory: app
+        working-directory: labs/40-containerized-node-app/app
         run: npm ci
 
       # Tests applicatifs
       - name: Run tests if present
-        working-directory: app
+        working-directory: labs/40-containerized-node-app/app
         run: npm test --if-present
 
       # Build image
+      # Note : on se place dans le dossier du lab pour que Docker trouve le Dockerfile
       - name: Build Docker image
-        run: docker build -t quote-app -f docker/Dockerfile .
+        run: |
+          cd labs/40-containerized-node-app
+          docker build -t quote-app -f docker/Dockerfile .
 
       # Test runtime
       - name: Run container
