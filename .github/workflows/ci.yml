@@ -1,14 +1,13 @@
-name: CI Preview
+name: CI
 # ci preview ok 
 on:
   push:
+  pull_request:
+
 
 jobs:
-  preview:
+  build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Run preview script
-        run: ./scripts/ci-preview.sh
+    - name: Check out repository
+      uses: actions/checkout@v4
