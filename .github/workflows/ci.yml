@@ -2,13 +2,10 @@ name: CI
 
 on:
   push:
-    branches: [ main, master ]
   pull_request:
-    branches: [ main, master ]
 
 jobs:
   build:
-    name: Build and Validate
     runs-on: ubuntu-latest
 
     steps:
@@ -21,8 +18,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "24"
-          cache: 'npm'
-          cache-dependency-path: app/package-lock.json
 
       # Installation dépendances
       - name: Install dependencies
@@ -39,7 +34,7 @@ jobs:
         run: docker build -t quote-app -f docker/Dockerfile .
 
       # Test runtime
-      - name: Run container & Health check
+      - name: Run container
         run: |
           docker run -d --name quote-app -p 3000:3000 quote-app
           for i in $(seq 1 30); do
@@ -50,7 +45,7 @@ jobs:
             sleep 1
           done
           echo "Health check failed"
-          docker logs quote-app
+          docker logs quote-app || true
           exit 1
 
       # Nettoyage conteneur
