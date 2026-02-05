@@ -5,7 +5,6 @@ on:
   pull_request:
 
 jobs:
-
   test-app:
     name: Unit Tests
     runs-on: ubuntu-latest
@@ -28,14 +27,14 @@ jobs:
         working-directory: labs/40-containerized-node-app/app
         run: npm test --if-present
 
-  
-  # a besoin de test app pour lancer grace à need
+  # faire le build uniquement si test app passe 
   build-and-verify:
     name: Docker Build & Smoke Test
     needs: test-app 
     runs-on: ubuntu-latest
     
     steps:
+      # 
       - name: Check out repository
         uses: actions/checkout@v4
 
@@ -44,13 +43,15 @@ jobs:
           cd labs/40-containerized-node-app
           docker build -t quote-app -f docker/Dockerfile .
 
-      - name: Run container (Smoke Test)
+      - name: Run container 
+        # test sur endpoint 
         run: |
           docker run -d --name quote-app -p 3000:3000 quote-app
           
           echo "Waiting for container to start..."
           for i in $(seq 1 30); do
-            if curl -fsS http://localhost:3000/health >/dev/null; then
+            # LANE A : Vérification stricte du contenu (doit contenir "ok")
+            if curl -fsS http://localhost:3000/health | grep -q "ok"; then
               echo " Health check passed"
               exit 0
             fi
@@ -60,7 +61,7 @@ jobs:
           echo " Health check failed"
           docker logs quote-app
           exit 1
-
+      # stop container 
       - name: Stop container
         if: always()
         run: docker rm -f quote-app || true
