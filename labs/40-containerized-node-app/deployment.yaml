@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: quote-app
+  namespace: quote-lab
+spec:
+  replicas: 3 # On commence avec 3 pour montrer le scaling
+  selector:
+    matchLabels:
+      app: quote-app
+  template:
+    metadata:
+      labels:
+        app: quote-app
+    spec:
+      containers:
+        - name: quote-app
+          # Nom exact tel qu'importé dans k3s
+          image: docker.io/library/quote-app:local
+          imagePullPolicy: Never
+          
+          ports:
+            - containerPort: 3000
+          
+          # --- Section Extension Lane E: Resource Management ---
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "100m"    # Réserve 0.1 CPU
+            limits:
+              memory: "128Mi"
+              cpu: "200m"    # Limite à 0.2 CPU pour éviter de saturer ton PC
+          
+          # --- Validation du comportement Runtime (Probes) ---
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+      
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 10 # On laisse un peu de temps au démarrage
+            periodSeconds: 10
+          
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 5

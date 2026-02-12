@@ -27,14 +27,13 @@ jobs:
         working-directory: labs/40-containerized-node-app/app
         run: npm test --if-present
 
-  # faire le build uniquement si test app passe 
+  # faire le build uniquement si test app passe grâce a needs: test-app
   build-and-verify:
     name: Docker Build & Smoke Test
     needs: test-app 
     runs-on: ubuntu-latest
     
     steps:
-      # 
       - name: Check out repository
         uses: actions/checkout@v4
 
