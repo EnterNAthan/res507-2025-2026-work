@@ -8,6 +8,14 @@ spec:
   selector:
     matchLabels:
       app: quote-app
+  
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      #permet de garder les 3 good  
+      maxUnavailable: 0
+
   template:
     metadata:
       labels:
@@ -15,40 +23,48 @@ spec:
     spec:
       containers:
         - name: quote-app
-          # Nom exact tel qu'importé dans k3s
-          image: docker.io/library/quote-app:local
+          image: quote-app:v2
           imagePullPolicy: Never
-          
+
           ports:
             - containerPort: 3000
-          
+
+          env:
+            - name: PORT
+              value: "3000"
+            - name: HOST
+              value: "0.0.0.0"
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: quote-db-secret
+                  key: POSTGRES_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: quote-db-secret
+                  key: POSTGRES_PASSWORD
+
           # --- Section Extension Lane E: Resource Management ---
           resources:
             requests:
               memory: "64Mi"
-              cpu: "100m"    # Réserve 0.1 CPU
+              cpu: "100m"
             limits:
               memory: "128Mi"
-              cpu: "200m"    # Limite à 0.2 CPU pour éviter de saturer ton PC
-          
+              cpu: "200m"
+
           # --- Validation du comportement Runtime (Probes) ---
           readinessProbe:
             httpGet:
               path: /health
               port: 3000
             initialDelaySeconds: 5
-            periodSeconds: 10
-      
+            periodSeconds: 5
+
           livenessProbe:
             httpGet:
               path: /health
               port: 3000
-            initialDelaySeconds: 10 # On laisse un peu de temps au démarrage
+            initialDelaySeconds: 10
             periodSeconds: 10
-          
-          readinessProbe:
-            httpGet:
-              path: /health
-              port: 3000
-            initialDelaySeconds: 5
-            periodSeconds: 5

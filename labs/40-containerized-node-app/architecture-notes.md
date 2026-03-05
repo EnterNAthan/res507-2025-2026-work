@@ -2,7 +2,7 @@
 
 ### Step 1 2 3
 
-![image-20260212132536733](C:\Users\carquein\AppData\Roaming\Typora\typora-user-images\image-20260212132536733.png)**Analyse du Diagramme : **
+![architecture-diagram](images/image-20260212132536733.png)**Analyse du Diagramme : **
 
 1. L'isolation : Elle se produit au niveau du Pod (chaque instance a son propre espace réseau et système de fichiers) et du Cluster (isolé de l'infrastructure physique).
 2. Redémarrage automatique : Si un Pod échoue, le Deployment détecte que l'état actuel ne correspond pas à l'état désiré et recrée un nouveau Pod.
@@ -52,7 +52,7 @@ On peut voir que :
 - Pourquoi ? Kubernetes compare constamment l'état désiré (3 réplicas) à l'état actuel (2 réplicas après la suppression). Dès qu'un écart est détecté, il crée un nouveau Pod pour rétablir l'équilibre.
 - Et si le nœud complet échouait ? Si un serveur (nœud) tombe, Kubernetes détecte que les Pods ne répondent plus. Il attend un délai de grâce, puis replanifie automatiquement ces Pods sur d'autres nœuds sains du cluster pour garantir la continuité du service.
 
-![image-20260212135932927](C:\Users\carquein\AppData\Roaming\Typora\typora-user-images\image-20260212135932927.png)
+![pod-deletion-recovery](images/image-20260212135932927.png)
 
 ### Step 6 : Ressource limits
 
@@ -140,6 +140,7 @@ kubectl set image deployment/quote-app quote-app=quote-app:v2 -n quote-lab
 ```
 
 **Observation du rollout :**
+
 ```
 kubectl rollout status deployment quote-app -n quote-lab
 
@@ -256,7 +257,7 @@ strategy:
 
 ---
 
-### Tests end-to-end (stretch)
+### Tests end-to-end
 
 - **Ce que testeraient des E2E tests :** Chargement de la page d'accueil, soumission d'une nouvelle quote via le formulaire, vérification que la quote apparaît dans la liste, validation du endpoint `/health`, et test que `/api/quotes` retourne bien du JSON.
 - **Où les exécuter :** Localement lors du développement pour un feedback rapide, et en CI (GitHub Actions) après chaque push avant le déploiement en production.
